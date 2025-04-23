@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.4.4</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.mycart</groupId>
+	<artifactId>mycart-service</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>mycart-service</name>
+	<description>Demo project for Spring Boot</description>
+	<url/>
+	<licenses>
+		<license/>
+	</licenses>
+	<developers>
+		<developer/>
+	</developers>
+	<scm>
+		<connection/>
+		<developerConnection/>
+		<tag/>
+		<url/>
+	</scm>
+	<properties>
+		<java.version>21</java.version>
+		<camel.version>4.3.0</camel.version>
+	</properties>
+<!--	<dependencies>-->
+
+<!--		<dependency>-->
+<!--			<groupId>org.apache.camel.springboot</groupId>-->
+<!--			<artifactId>camel-spring-boot-starter</artifactId>-->
+<!--			<version>4.11.0</version>-->
+<!--		</dependency>-->
+<!--		&lt;!&ndash; https://mvnrepository.com/artifact/org.apache.camel/camel-jackson &ndash;&gt;-->
+<!--		<dependency>-->
+<!--			<groupId>org.apache.camel</groupId>-->
+<!--			<artifactId>camel-jackson</artifactId>-->
+<!--			<version>4.11.0</version>-->
+<!--		</dependency>-->
+
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.boot</groupId>-->
+<!--			<artifactId>spring-boot-devtools</artifactId>-->
+<!--			<scope>runtime</scope>-->
+<!--			<optional>true</optional>-->
+<!--		</dependency>-->
+<!--		&lt;!&ndash; Spring Boot Starters &ndash;&gt;-->
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.boot</groupId>-->
+<!--			<artifactId>spring-boot-starter-data-mongodb</artifactId>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.boot</groupId>-->
+<!--			<artifactId>spring-boot-starter-web</artifactId>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.boot</groupId>-->
+<!--			<artifactId>spring-boot-configuration-processor</artifactId>-->
+<!--			<version>3.4.4</version>-->
+<!--		</dependency>-->
+
+<!--		&lt;!&ndash; Apache Camel Starters (all same version) &ndash;&gt;-->
+<!--		<dependency>-->
+<!--			<groupId>org.apache.camel.springboot</groupId>-->
+<!--			<artifactId>camel-spring-boot-starter</artifactId>-->
+<!--			<version>4.11.0</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>org.apache.camel.springboot</groupId>-->
+<!--			<artifactId>camel-mongodb-starter</artifactId>-->
+<!--			<version>4.11.0</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>org.apache.camel.springboot</groupId>-->
+<!--			<artifactId>camel-rest-starter</artifactId>-->
+<!--			<version>4.11.0</version>-->
+<!--		</dependency>-->
+<!--		&lt;!&ndash; https://mvnrepository.com/artifact/org.apache.camel/camel-rest &ndash;&gt;-->
+<!--		<dependency>-->
+<!--			<groupId>org.apache.camel</groupId>-->
+<!--			<artifactId>camel-rest</artifactId>-->
+<!--			<version>4.11.0</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>org.apache.camel.springboot</groupId>-->
+<!--			<artifactId>camel-jackson-starter</artifactId>-->
+<!--			<version>4.11.0</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>org.projectlombok</groupId>-->
+<!--			<artifactId>lombok</artifactId>-->
+<!--			<optional>true</optional>-->
+<!--		</dependency>-->
+<!--		&lt;!&ndash; https://mvnrepository.com/artifact/org.apache.camel/camel-servlet &ndash;&gt;-->
+<!--		<dependency>-->
+<!--			<groupId>org.apache.camel</groupId>-->
+<!--			<artifactId>camel-servlet</artifactId>-->
+<!--			<version>4.11.0</version>-->
+<!--		</dependency>-->
+
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.boot</groupId>-->
+<!--			<artifactId>spring-boot-starter-test</artifactId>-->
+<!--			<scope>test</scope>-->
+<!--		</dependency>-->
+<!--	</dependencies>-->
+	<dependencies>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.6.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-mongodb</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.camel.springboot</groupId>
+			<artifactId>camel-spring-boot-starter</artifactId>
+			<version>${camel.version}</version>
+		</dependency>
+		<!-- Use Servlet component instead of Restlet -->
+		<dependency>
+			<groupId>org.apache.camel.springboot</groupId>
+			<artifactId>camel-netty-http-starter</artifactId>
+			<version>4.3.0</version>
+		</dependency>
+
+
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.camel.springboot</groupId>
+			<artifactId>camel-mongodb-starter</artifactId>
+			<version>${camel.version}</version>
+		</dependency>
+
+		<!-- ActiveMQ Classic for Camel -->
+		<dependency>
+			<groupId>org.apache.camel.springboot</groupId>
+			<artifactId>camel-activemq-starter</artifactId>
+			<version>${camel.version}</version>
+		</dependency>
+
+
+		<!-- ActiveMQ Classic JMS Client -->
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-client</artifactId>
+			<version>5.18.2</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.camel/camel-jsonpath -->
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-jsonpath</artifactId>
+			<version>4.3.0</version>
+		</dependency>
+
+
+
+
+		<!-- Jackson for JSON binding -->
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</path>
+					</annotationProcessorPaths>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
