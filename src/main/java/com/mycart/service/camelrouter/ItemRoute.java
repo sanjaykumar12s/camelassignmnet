@@ -155,52 +155,38 @@ public class ItemRoute extends RouteBuilder {
         //-----------------------------------------------------------------------------------------
         // Update stock / products count
         //TODO: Change the query into findById
+        //TODO: ONLY USING OF PROCESSOR
+
+//        rest("/inventory/update")
+//                .post()
+//                .to("direct:updateInventory");
+//
+//        from("direct:updateInventory")
+//                .onException(ProcessException.class)
+//                .handled(true)
+//                .process(new ErrorProcessor())
+//                .end()
+//                .process(new InventoryUpdateProcessor())
+//                .split(simple("${exchangeProperty.inventoryList}")).streaming()
+//                .process(new InventoryValidationProcessor())//TODO
+//                .setHeader("CamelMongoDbCriteria", simple("{ \"_id\": \"${exchangeProperty.itemId}\" }"))
+//                .setBody(simple("${header.itemId}"))
+//                .to("mongodb:myMongo?database=mycartdb&collection=item&operation=findById")
+//                .process(new StockComputationProcessor())
+//                .choice()
+//                .when(simple("${exchangeProperty.skipUpdate} == true"))
+//                .stop()
+//                .otherwise()
+//                .to("mongodb:myMongo?database=mycartdb&collection=item&operation=save")
+//                .end()
+//                .end()
+//                .process(new FinalResponseProcessor());
+
+                // TODO ONLY USING OF BEAN
 
         rest("/inventory/update")
                 .post()
                 .to("direct:updateInventory");
-
-//        from("direct:updateInventory")
-//                .onException(ProcessException.class)
-//                .handled(true)
-//                .process(new ErrorProcessor())
-//                .end()
-//                .process(new InventoryUpdateProcessor())
-//                .split(simple("${exchangeProperty.inventoryList}")).streaming()
-//                .process(new InventoryValidationProcessor())//TODO
-//                .setHeader("CamelMongoDbCriteria", simple("{ \"_id\": \"${exchangeProperty.itemId}\" }"))
-//                .setBody(simple("${header.itemId}"))
-//                .to("mongodb:myMongo?database=mycartdb&collection=item&operation=findById")
-//                .process(new StockComputationProcessor())
-//                .choice()
-//                .when(simple("${exchangeProperty.skipUpdate} == true"))
-//                .stop()
-//                .otherwise()
-//                .to("mongodb:myMongo?database=mycartdb&collection=item&operation=save")
-//                .end()
-//                .end()
-//                .process(new FinalResponseProcessor());
-
-//        from("direct:updateInventory")
-//                .onException(ProcessException.class)
-//                .handled(true)
-//                .process(new ErrorProcessor())
-//                .end()
-//                .process(new InventoryUpdateProcessor())
-//                .split(simple("${exchangeProperty.inventoryList}")).streaming()
-//                .process(new InventoryValidationProcessor())//TODO
-//                .setHeader("CamelMongoDbCriteria", simple("{ \"_id\": \"${exchangeProperty.itemId}\" }"))
-//                .setBody(simple("${header.itemId}"))
-//                .to("mongodb:myMongo?database=mycartdb&collection=item&operation=findById")
-//                .process(new StockComputationProcessor())
-//                .choice()
-//                .when(simple("${exchangeProperty.skipUpdate} == true"))
-//                .stop()
-//                .otherwise()
-//                .to("mongodb:myMongo?database=mycartdb&collection=item&operation=save")
-//                .end()
-//                .end()
-//                .process(new FinalResponseProcessor());
 
         from("direct:updateInventory")
                 .onException(ProcessException.class)
@@ -209,11 +195,11 @@ public class ItemRoute extends RouteBuilder {
                 .end()
                 .bean("inventoryUpdates", "validateInventoryRequest") // replaces InventoryUpdateProcessor
                 .split(simple("${exchangeProperty.inventoryList}")).streaming()
-                .bean("inventoryUpdates", "validateItemFields") // replaces InventoryValidationProcessor
+                .bean("inventoryUpdates", "extractAndValidateStockFields") // replaces InventoryValidationProcessor
                 .setHeader("CamelMongoDbCriteria", simple("{ \"_id\": \"${exchangeProperty.itemId}\" }"))
                 .setBody(simple("${header.itemId}"))
                 .to("mongodb:myMongo?database=mycartdb&collection=item&operation=findById")
-                .bean("inventoryUpdates", "computeStock") // replaces StockComputationProcessor
+                .bean("inventoryUpdates", "computeUnifiedStock") // replaces StockComputationProcessor
                 .choice()
                 .when(simple("${exchangeProperty.skipUpdate} == true"))
                 .stop()
@@ -223,50 +209,7 @@ public class ItemRoute extends RouteBuilder {
                 .end()
                 .bean("inventoryUpdates", "prepareFinalResponse"); // replaces FinalResponseProcessor
 
-
-        //TODO NORMAL UPDATING BUT 1 ONE MESSAGE ONLY(ONLY ACTIVEMQ)
-
-
-//        rest("/inventory/Asynchronous/update")
-//                .post()
-//                .type(Map.class)
-//                .to("direct:sendToQueue");
-//
-//        from("direct:sendToQueue")
-//                .routeId("InventoryUpdateProducer")
-//                .log("Received inventory update payload: ${body}")
-//                .marshal().json(JsonLibrary.Jackson)  // Use Jackson for JSON Marshalling
-//                .to("activemq:queue:inventory.queue?concurrentConsumers=1") // ActiveMQ queue with 1 consumer
-//                .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(202))  // Set HTTP response code to 202
-//                .setBody().constant(Map.of("message", "Inventory update received and queued for processing"));
-//
-//// Consumer Route – processes messages from ActiveMQ queue using Beans
-//        from("activemq:queue:inventory.queue?concurrentConsumers=1")
-//                .routeId("InventoryUpdateConsumer")
-//                .log("Consuming inventory update message from ActiveMQ queue")
-//                .unmarshal().json(JsonLibrary.Jackson, Map.class)  // Unmarshal the message into a Map
-//                .onException(ProcessException.class)  // Handle process exceptions
-//                .handled(true)
-//                .bean("inventoryUpdates", "handleError") // Error handler bean
-//                .end()
-//                .bean("inventoryUpdates", "validateInventoryRequest") // Validate the inventory request
-//                .split(simple("${exchangeProperty.inventoryList}")).streaming()  // Split the inventory list and process each item
-//                .bean("inventoryUpdates", "validateItemFields") // Validate individual item fields
-//                .setHeader("CamelMongoDbCriteria", simple("{ \"_id\": \"${exchangeProperty.itemId}\" }"))  // MongoDB query criteria
-//                .setBody(simple("${header.itemId}"))
-//                .to("mongodb:myMongo?database=mycartdb&collection=item&operation=findById")  // Retrieve item from MongoDB by ID
-//                .bean("inventoryUpdates", "computeStock") // Perform stock computation
-//                .choice()
-//                .when(simple("${exchangeProperty.skipUpdate} == true"))  // Check if update should be skipped
-//                .stop()  // Stop processing if skipped
-//                .otherwise()
-//                .to("mongodb:myMongo?database=mycartdb&collection=item&operation=save")  // Save updated item to DB
-//                .end()
-//                .end() // End split block
-//                .bean("inventoryUpdates", "prepareFinalResponse");  // Prepare final response after processing
-
-        // Route to handle the inventory update request
-            //TODO WORKING ALL BUT ACTIVEMQ ONLY
+        //TODO  WORKING FOR BOTH ACTIVEMQ AND THEN SEDA)
 //        rest("/inventory/Asynchronous/update")
 //                .post()
 //                .to("direct:inventoryInput");
@@ -275,14 +218,14 @@ public class ItemRoute extends RouteBuilder {
 //                .log(" Received inventory update request")
 //                .bean("asyncInventoryUpdates", "flattenItems")
 //                .split(body()).streaming()
-//                .to("activemq:queue:updateInventory")
+//                .to("activemq:queue:updateInventory")  // Sending the request to ActiveMQ
 //                .end()
 //                .setBody(constant(" Inventory update request accepted for asynchronous processing"))
 //                .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(202));
 //
 //        from("activemq:queue:updateInventory")
 //                .routeId("asyncInventoryProcessor")
-//                .log(" Consuming inventory update message from queue")
+//                .log(" Consuming inventory update message from ActiveMQ queue")
 //                .process(exchange -> {
 //                    List<Map<String, Object>> itemList = new ArrayList<>();
 //                    itemList.add(exchange.getIn().getBody(Map.class));
@@ -290,6 +233,10 @@ public class ItemRoute extends RouteBuilder {
 //                    exchange.setProperty("successList", new ArrayList<>());
 //                    exchange.setProperty("failureList", new ArrayList<>());
 //                })
+//                .to("seda:processInventoryUpdate");  // Using Seda to hold the message for further processing
+//
+//        from("seda:processInventoryUpdate")
+//                .log("🛠️ Processing inventory update in Seda queue")
 //                .split(simple("${exchangeProperty.inventoryList}")).streaming()
 //                .doTry()
 //                .bean("asyncInventoryUpdates", "extractStockDetails")
@@ -302,50 +249,58 @@ public class ItemRoute extends RouteBuilder {
 //                .bean("asyncInventoryUpdates", "trackFailure")
 //                .end()
 //                .end()
-//                .bean("asyncInventoryUpdates", "saveFinalStatus");
+//                .bean("asyncInventoryUpdates", "saveFinalStatus");  // Final status saving to the database
+// REST API Endpoint to initiate the inventory update (Asynchronous)
+        // REST API Endpoint to initiate the inventory update (Asynchronous)
+
+
+//        rest("/inventory/Asynchronous/update")
+//                .post()
+//                .to("direct:inventoryInput");
 //
-
-        //TODO  WORKING FOR BOTH ACTIVEMQ AND THEN SEDA)
-        rest("/inventory/Asynchronous/update")
-                .post()
-                .to("direct:inventoryInput");
-
-        from("direct:inventoryInput")
-                .log(" Received inventory update request")
-                .bean("asyncInventoryUpdates", "flattenItems")
-                .split(body()).streaming()
-                .to("activemq:queue:updateInventory")  // Sending the request to ActiveMQ
-                .end()
-                .setBody(constant(" Inventory update request accepted for asynchronous processing"))
-                .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(202));
-
-        from("activemq:queue:updateInventory")
-                .routeId("asyncInventoryProcessor")
-                .log(" Consuming inventory update message from ActiveMQ queue")
-                .process(exchange -> {
-                    List<Map<String, Object>> itemList = new ArrayList<>();
-                    itemList.add(exchange.getIn().getBody(Map.class));
-                    exchange.setProperty("inventoryList", itemList);
-                    exchange.setProperty("successList", new ArrayList<>());
-                    exchange.setProperty("failureList", new ArrayList<>());
-                })
-                .to("seda:processInventoryUpdate");  // Using Seda to hold the message for further processing
-
-        from("seda:processInventoryUpdate")
-                .log("🛠️ Processing inventory update in Seda queue")
-                .split(simple("${exchangeProperty.inventoryList}")).streaming()
-                .doTry()
-                .bean("asyncInventoryUpdates", "extractStockDetails")
-                .setHeader("CamelMongoDbCriteria", simple("{ \"_id\": \"${exchangeProperty.itemId}\" }"))
-                .to("mongodb:myDb?database=mycartdb&collection=item&operation=findOneByQuery")
-                .bean("asyncInventoryUpdates", "computeAndUpdateStock")
-                .to("mongodb:myDb?database=mycartdb&collection=item&operation=save")
-                .bean("asyncInventoryUpdates", "trackSuccess")
-                .doCatch(Exception.class)
-                .bean("asyncInventoryUpdates", "trackFailure")
-                .end()
-                .end()
-                .bean("asyncInventoryUpdates", "saveFinalStatus");  // Final status saving to the database
+//        // Direct endpoint to handle incoming request and enqueue for async processing
+//        from("direct:inventoryInput")
+//                .log("Received inventory update request with ${body[items].size()} items")
+//                .setBody(simple("${body[items]}")) // Extract the list of items to become the new body
+//                .split(body()).streaming() // Split items to be processed individually
+//                .log("Enqueuing inventory update for item: ${body}")
+//                .to("activemq:queue:updateInventory") // Enqueue items into ActiveMQ
+//                .log("Item enqueued successfully: ${body}")
+//                .end()
+//                .setBody(constant("Inventory update request accepted for asynchronous processing"))
+//                .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(202));
+//
+//        // Route to process items in ActiveMQ queue asynchronously
+//        from("activemq:queue:updateInventory")
+//                .routeId("asyncInventoryProcessor")
+//                .log("Dequeuing inventory update message for item: ${body}")
+//                .process(exchange -> {
+//                    // Extract item and set properties to pass through the flow
+//                    Map<String, Object> item = exchange.getIn().getBody(Map.class);
+//                    List<Map<String, Object>> itemList = new ArrayList<>();
+//                    itemList.add(item); // Put item in list to proceed with the same processing logic
+//                    exchange.setProperty("inventoryList", itemList);
+//                    exchange.setProperty("successList", new ArrayList<>());
+//                    exchange.setProperty("failureList", new ArrayList<>());
+//                })
+//                .to("seda:processInventoryUpdate"); // Passing to Seda queue for processing
+//
+//        // Seda queue to process each item asynchronously
+//        from("seda:processInventoryUpdate")
+//                .log(" Processing inventory update in Seda queue for item: ${body}")
+//                .split(simple("${exchangeProperty.inventoryList}")).streaming()
+//                .doTry()
+//                .bean("inventoryUpdates", "extractAndValidateStockFields")
+//                .setHeader("CamelMongoDbCriteria", simple("{ \"_id\": \"${exchangeProperty.itemId}\" }"))
+//                .to("mongodb:myDb?database=mycartdb&collection=item&operation=findOneByQuery")
+//                .bean("inventoryUpdates", "computeUnifiedStock")
+//                .to("mongodb:myDb?database=mycartdb&collection=item&operation=save")
+//                .bean("inventoryUpdates", "trackSuccess")
+//                .doCatch(Exception.class)
+//                .bean("inventoryUpdates", "trackFailure")
+//                .end()
+//                .setProperty("errorList", constant(new ArrayList<>())) // Initialize errorList property here
+//                .bean("inventoryUpdates", "saveFinalStatus");
 
     }
 }

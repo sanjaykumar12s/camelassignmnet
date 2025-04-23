@@ -1,4 +1,4 @@
-package com.mycart.service;
+package com.mycart.service.demo;
 
 public class dummy {
 
